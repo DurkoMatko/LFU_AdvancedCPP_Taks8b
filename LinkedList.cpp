@@ -3,7 +3,8 @@
 #include <iostream>
 
 
-std::ostream& operator<<(std::ostream& os,LinkedList& list)
+template <typename U>
+std::ostream& operator<<(std::ostream& os,LinkedList<U>& list)
 {
 	list.rewindToHead();
 
@@ -14,8 +15,10 @@ std::ostream& operator<<(std::ostream& os,LinkedList& list)
     os << std::endl;
 }
 
+
 //copy assign operator
-LinkedList &LinkedList::operator=(LinkedList& list) noexcept{
+template<typename T>
+LinkedList<T> &LinkedList<T>::operator=(LinkedList<T>& list) noexcept{
 	//if they are not the same objects		
 	if(head!=list.head){
 		//delete previous contents
@@ -35,7 +38,6 @@ LinkedList &LinkedList::operator=(LinkedList& list) noexcept{
 		//if next exists
 		while(list.cur->next != NULL){
 			n->x = list.cur->x;
-			std::cout << "Copied " << n->x <<std::endl;
 			//create next one
 			n->next = new Node();
 
@@ -45,7 +47,6 @@ LinkedList &LinkedList::operator=(LinkedList& list) noexcept{
 		}
 		//next one does not exist so just finish copying this node
 		n->x = list.cur->x;
-		std::cout << "Copied " << n->x <<std::endl;
 		n->next == NULL;
 		list.rewindToHead();
 		rewindToHead();
@@ -53,14 +54,17 @@ LinkedList &LinkedList::operator=(LinkedList& list) noexcept{
 	return *this;
 }
 
+
+
 //default constructor
-LinkedList::LinkedList(){
+template<typename T>
+LinkedList<T>::LinkedList(){
 	head=NULL;
 	cur = NULL;
 }
 
-
-LinkedList::~LinkedList(){
+template<typename T>
+LinkedList<T>::~LinkedList(){
 	rewindToHead();
     while(hasValue()){
     	Node *n = cur;
@@ -69,8 +73,10 @@ LinkedList::~LinkedList(){
     }
 }
 
+
 //copy constructor
-LinkedList::LinkedList(LinkedList& list) noexcept{
+template<typename T>
+LinkedList<T>::LinkedList(LinkedList& list) noexcept{
 	list.rewindToHead();
 
 	if(list.head==NULL){
@@ -86,7 +92,6 @@ LinkedList::LinkedList(LinkedList& list) noexcept{
 		//if next exists
 		while(list.cur->next != NULL){
 			n->x = list.cur->x;
-			std::cout << "Copied " << n->x <<std::endl;
 			//create next one
 			n->next = new Node();
 
@@ -96,14 +101,14 @@ LinkedList::LinkedList(LinkedList& list) noexcept{
 		}
 		//next one does not exist so just finish copying this node
 		n->x = list.cur->x;
-		std::cout << "Copied " << n->x <<std::endl;
 		n->next == NULL;
 	}
 	list.rewindToHead();
 }
 
 // append a new value at the beginning of the list
-void LinkedList::addHead(int val){
+template<typename T>
+void LinkedList<T>::addHead(T val){
 	//create new node
     Node *n = new Node();   
     n->x = val;             
@@ -114,45 +119,62 @@ void LinkedList::addHead(int val){
     cur = head;
 }
 
-void LinkedList::addTail(int val){
-	//make cursor point to tail of list
-	rewindToTail();
+template<typename T>
+void LinkedList<T>::addTail(T val){
+	
+	//if not empty
+	if(hasValue())
+		//make cursor point to tail of list
+		rewindToTail();
+
+	//create node for value
 	Node *n = new Node();   
     n->x = val;
     n->next = NULL;
 
-    //add to tail
-    cur->next = n;
+    //check if not empty list
+    if(hasValue()){
+	    //add to tail
+	    cur->next = n;
+	}
+	else{
+		//if empty, create first node
+		head = n;
+		cur = head;
+	}
+
 
 }
 
-// returns the first element in the list and deletes the Node.
-int LinkedList::popValue(){
+// returns the value of a head and deletes is + sets the new head
+template<typename T>
+T LinkedList<T>::popValue(){
     Node *n = head;
-    int ret = n->x;
+    T ret = n->x;
 
     //set head to next node
     head = head->next;
-    //check if NULL - means empty list 
-    if(head == NULL)
-    	cur = NULL;
+    cur=head;
 
     delete n;
     return ret;
 }
 
-void LinkedList::rewindToHead(){
+template<typename T>
+void LinkedList<T>::rewindToHead(){
 	cur = head;
 }
 
-void LinkedList::rewindToTail(){
+template<typename T>
+void LinkedList<T>::rewindToTail(){
 	//just loop till not at the tail
 	while(cur->next != NULL){
 		cur = cur->next;
 	}
 }
 
-bool LinkedList::next(){
+template<typename T>
+bool LinkedList<T>::next(){
 	if(cur!=NULL){
 		cur = cur->next;
 		return true;
@@ -160,27 +182,37 @@ bool LinkedList::next(){
 	return false;
 }
 
-int LinkedList::getValue() const{
+template<typename T>
+T LinkedList<T>::getValue() const{
 	if(cur!=NULL){
 		return cur->x;
 	}
 	return 0;   //should be exception
 }
 
-bool LinkedList::hasValue() const{
+template<typename T>
+bool LinkedList<T>::hasValue() const{
 	return ( cur != NULL ? true : false );
 }
 
-void LinkedList::printAndDelete(){
+template<typename T>
+void LinkedList<T>::printAndDelete(){
 	rewindToHead();
     while(hasValue()){
     	std::cout << popValue() << std::endl;	
     }
 }
 
-void LinkedList::addList(LinkedList& list){
+template<typename T>
+void LinkedList<T>::addList(LinkedList<T>& list){
 	list.rewindToHead();
 	while(list.hasValue()){
 		addTail(list.popValue());
 	}
+}
+
+template <typename T> 
+template <typename U> 
+U LinkedList<T>::getDefaultValueForType(){
+	return U();
 }

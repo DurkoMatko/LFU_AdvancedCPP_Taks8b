@@ -3,34 +3,45 @@
 
 #include <iostream>
 
-//template<typename InputIterator, class T>
+template<typename V> struct X{};
+
+template<typename T>
 class LinkedList{
 
 	struct Node {
-        int x;
+        T x;
         Node *next;
     };
 
 	public:
 		LinkedList();
-		LinkedList(LinkedList& list) noexcept;   //copy constructor
+		LinkedList(LinkedList<T>& list) noexcept;   //copy constructor
 		~LinkedList();
-		void addHead(int val);
-		void addTail(int val);
-		int popValue();
+		void addHead(T val);
+		void addTail(T val);
+		T popValue();
 		void rewindToHead();
 		void rewindToTail();
 		bool next();
-		int getValue() const;
+		T getValue() const;
 		bool hasValue() const;
 		void printAndDelete();
-		void addList(LinkedList& list);
+		void addList(LinkedList<T>& list);
+		template <typename U> 
+		static U getDefaultValueForType();
 
-		friend std::ostream& operator<<(std::ostream& os, LinkedList& g);	//needs to be friend cuz it's defined outside of class and needs to access ajacencyList
-		LinkedList& operator=(LinkedList& list) noexcept;
+
+		//more options described in http://stackoverflow.com/questions/4660123/overloading-friend-operator-for-template-class/4661372#4661372
+		//e.g inline declaration here
+		//this option makes friend of whole template for << so LinkedList<double> can be printed from LinkedList<int> class
+		template <typename U>
+		friend std::ostream& operator<<(std::ostream& os, LinkedList<U>& list);
+		LinkedList<T>& operator=(LinkedList<T>& list) noexcept;
 	private:
 		Node *head;
 		Node *cur;
+		//std::shared_ptr<Node> head;
+		//std::shared_ptr<Node> cur;
 };
 
 #endif //LINKEDLIST_H
